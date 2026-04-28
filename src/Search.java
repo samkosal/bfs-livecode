@@ -67,9 +67,7 @@ public class Search {
         while(!queue.isEmpty()) {
             Location current = queue.poll();
 
-            if (visited.contains(current)) {
-                continue;
-            }
+            
             visited.add(current);
             if (maze[current.row()][current.col()] == 'c') {
                 List<Location> path = new ArrayList<>();
@@ -91,6 +89,7 @@ public class Search {
             for (Location neighbor : neighbors(maze, current)) {
                 if (!visited.contains(neighbor)) {
                     queue.add(neighbor);
+                    visited.add(current);
                     prevs.put(neighbor, current);
                 }
                     
