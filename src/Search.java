@@ -1,15 +1,30 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Map;
+
 
 public class Search {
 
     public static void main(String[] args) {
-        Location mylocation = new Location(5, 88);
-        System.out.println(mylocation.row());
+        // Location mylocation = new Location(5, 88);
+        // System.out.println(mylocation.row());
+
+        char[][] grid = {
+            {'o', 'o', 'o', 'o', 'c', 'w', 'c', 'o'},
+            {'w', 'o', 'o', 'w', 'w', 'c', 'w', 'o'},
+            {'o', 'o', 'o', 'o', 'R', 'w', 'o', 'o'},
+            {'o', 'o', 'w', 'w', 'w', 'o', 'o', 'o'},
+            {'o', 'o', 'o', 'o', 'c', 'o', 'o', 'o'}
+        };
+
+
+
+        System.out.println(nearestCheese(grid));
     }
      /**
      * Finds the location of the nearest reachable cheese from the rat's position.
@@ -40,11 +55,14 @@ public class Search {
      * @throws CrowdedMazeException if there is more than one rat in the maze
      * @throws HungryRatException if there is no reachable cheese
      */
-    public static int[] nearestCheese(char[][] maze) throws EscapedRatException, CrowdedMazeException, HungryRatException {
+    public static Location nearestCheese(char[][] maze) throws EscapedRatException, CrowdedMazeException, HungryRatException {
         Location start = ratLocation(maze);
         Queue<Location> queue = new LinkedList<>();
-        Set<Location> visited = new HashSet<>();
         queue.add(start);
+
+        Set<Location> visited = new HashSet<>();
+
+        Map<Location, Location> prevs = new HashMap<>();
         
         while(!queue.isEmpty()) {
             Location current = queue.poll();
@@ -52,14 +70,30 @@ public class Search {
             if (visited.contains(current)) {
                 continue;
             }
+            visited.add(current);
             if (maze[current.row()][current.col()] == 'c') {
-                return new int[] {current.row(), current.col()};
+                List<Location> path = new ArrayList<>();
+
+                Location pointer = current;
+
+                while (!pointer.equals(start)) {
+                    path.add(pointer);
+                    pointer = prevs.get(pointer);
+                }
+
+                path.add(start);
+
+                System.out.println(path.reversed());
+
+                return current;
             }
 
-            visited.add(current);
-
             for (Location neighbor : neighbors(maze, current)) {
-                queue.add(neighbor);
+                if (!visited.contains(neighbor)) {
+                    queue.add(neighbor);
+                    prevs.put(neighbor, current);
+                }
+                    
 
             }
 
